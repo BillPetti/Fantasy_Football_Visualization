@@ -239,7 +239,104 @@ names(FPTS.Gini)[names(FPTS.Gini)=="Avg_Fantasy_Points"] <- "Consistency"
 require(sqldf)
 Gini_Tiers <- sqldf("select * from fftiers_all left join FPTS_Gini using (Player_Name)")
 
-#Data then used to create an interactive visualization in Tableau. Visualization can be found at: 
+## Scrape data for actual point projections by player/position
+
+# scrape QB Projections
+
+Test <- htmlParse("http://www.fantasypros.com/nfl/projections/qb.php")
+class(Test)
+Test.table<- readHTMLTable(Test,stringsAsFactors = FALSE)
+
+#you want the second table, not the first one
+QB <- sapply(Test.table[[2]][,], FUN= function(x) as.character(gsub(",", "", as.character(x), fixed = TRUE) ))	
+
+#convert to table
+QB<-as.data.frame(QB, stringsAsFactors=FALSE)
+
+#trim and keep only Player and FPTS columns
+
+QB <- sqldf("select Player, FPTS from QB")
+
+#rename Player column to Player_Name
+names(QB)[names(QB)=="Player"] <- "Player_Name"
+
+# scrape RB Projections
+
+Test <- htmlParse("http://www.fantasypros.com/nfl/projections/rb.php")
+class(Test)
+Test.table<- readHTMLTable(Test,stringsAsFactors = FALSE)
+
+#you want the second table, not the first one
+RB <- sapply(Test.table[[2]][,], FUN= function(x) as.character(gsub(",", "", as.character(x), fixed = TRUE) ))	
+
+#convert to table
+RB<-as.data.frame(RB, stringsAsFactors=FALSE)
+
+#trim and keep only Player and FPTS columns
+
+RB <- sqldf("select Player, FPTS from RB")
+
+#rename Player column to Player_Name
+names(RB)[names(RB)=="Player"] <- "Player_Name"
+
+# scrape WR Projections
+
+Test <- htmlParse("http://www.fantasypros.com/nfl/projections/wr.php")
+class(Test)
+Test.table<- readHTMLTable(Test,stringsAsFactors = FALSE)
+
+#you want the second table, not the first one
+WR <- sapply(Test.table[[2]][,], FUN= function(x) as.character(gsub(",", "", as.character(x), fixed = TRUE) ))	
+
+#convert to table
+WR <-as.data.frame(WR, stringsAsFactors=FALSE)
+
+#trim and keep only Player and FPTS columns
+
+WR <- sqldf("select Player, FPTS from WR")
+
+#rename Player column to Player_Name
+names(WR)[names(WR)=="Player"] <- "Player_Name"
+
+# scrape TE Projections
+
+Test <- htmlParse("http://www.fantasypros.com/nfl/projections/te.php")
+class(Test)
+Test.table<- readHTMLTable(Test,stringsAsFactors = FALSE)
+
+#you want the second table, not the first one
+TE <- sapply(Test.table[[2]][,], FUN= function(x) as.character(gsub(",", "", as.character(x), fixed = TRUE) ))	
+
+#convert to table
+TE <-as.data.frame(TE, stringsAsFactors=FALSE)
+
+#trim and keep only Player and FPTS columns
+
+TE <- sqldf("select Player, FPTS from TE")
+
+#rename Player column to Player_Name
+names(TE)[names(TE)=="Player"] <- "Player_Name"
+
+# Merge all position data tables together
+Proj <- rbind(QB,RB,WR,TE)
+
+# strip out teams and recreate data table with two columns (Player_Name and FPTS)
+Proj2 <- Proj
+#pull out teams and create a new column of just playe names
+Proj2 <- data.frame(do.call('rbind', strsplit(as.character(Proj2$Player_Name),'(',fixed=TRUE)))
+#transform Player_Name to a character class for matching
+Proj2$Player_Name <- as.character(Proj2$X1)
+Proj$Player_Name <- Proj2$Player_Name
+#trim leading and trailing spaces for Player_Names
+trim <- function (x) gsub("^\\s+|\\s+$", "", x)
+Proj$Player_Name <- trim(Proj$Player_Name)
+# transform FPTS to numeric
+Proj$FPTS <- as.numeric(Proj$FPTS)
+
+#Merge the new files together, and then merge with Gini_Tiers master file
+Gini_Tiers <- sqldf("select * from Gini_Tiers left join Proj using (Player_Name)")
+
+#Data then used to create an interactive visualization in Tableau. Visualization can be found at: https://public.tableausoftware.com/profile/billpetti#!/vizhome/FantasyFootballProjectionsandConsistency2014/ProjectionsvConsistency
 
 
 
