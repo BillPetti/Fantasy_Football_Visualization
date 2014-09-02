@@ -336,6 +336,10 @@ Proj$FPTS <- as.numeric(Proj$FPTS)
 #Merge the new files together, and then merge with Gini_Tiers master file
 Gini_Tiers <- sqldf("select * from Gini_Tiers left join Proj using (Player_Name)")
 
+#add FPTS/G column (assumes each player appears in 16 games)
+Gini_Tiers$FPTSperG<-Gini_Tiers$FPTS/16
+
+
 #Data then used to create an interactive visualization in Tableau. Visualization can be found at: https://public.tableausoftware.com/profile/billpetti#!/vizhome/FantasyFootballProjectionsandConsistency2014/ProjectionsvConsistency
 
 
