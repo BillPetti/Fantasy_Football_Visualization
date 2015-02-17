@@ -216,7 +216,7 @@ GROUP BY o.PLAYER, o.Game, o.YEAR
 ORDER BY ROUND(AVG(`FPTS`),1)  DESC
 
 # load data into R
-NFL_gamebygame_player_FPTS <- read.csv("~/Documents/SQL exports/NFL_gamebygame_player_FPTS.csv", stringsAsFactors=FALSE)
+NFL_gamebygame_player_FPTS <- read.csv("~/FFL2014/Fantasy_Football_Visualization/NFL_gamebygame_player_FPTS.csv", stringsAsFactors=FALSE)
 fftiers_all <- read.csv("~/FFL2014/fftiers/out/week0/csv/fftiers_all.csv")
 names(fftiers_all)[names(fftiers_all)=="Player.Name"] <- "Player_Name"
 
@@ -226,13 +226,13 @@ NFL<-NFL_gamebygame_player_FPTS
 # calculate consistency per player for 2011-2013 using Gini coefficients
 # load reldist package
 library(reldist)
-FPTS_Gini<-aggregate(Avg_Fantasy_Points ~ PLAYER, data = NFL, FUN = "gini")
+FPTS_Gini<-aggregate(Avg_Fantasy_Points ~ Player_Name, data = NFL, FUN = "gini")
 
 #Convert FPTS.Gini to a data frame
-FPTS.Gini<-data.frame(FPTS.Gini)
+FPTS_Gini<-data.frame(FPTS_Gini)
 
 #rename Avg_Fantasy_Points Consistency in the Gini output
-names(FPTS.Gini)[names(FPTS.Gini)=="Avg_Fantasy_Points"] <- "Consistency"
+names(FPTS_Gini)[names(FPTS_Gini)=="Avg_Fantasy_Points"] <- "Consistency"
 
 
 #Merge Consistency scores and Tier/Consensus Rankings from Boris Chen's data
@@ -240,6 +240,7 @@ require(sqldf)
 Gini_Tiers <- sqldf("select * from fftiers_all left join FPTS_Gini using (Player_Name)")
 
 ## Scrape data for actual point projections by player/position
+require(XML)
 
 # scrape QB Projections
 
@@ -336,8 +337,8 @@ Proj$FPTS <- as.numeric(Proj$FPTS)
 #Merge the new files together, and then merge with Gini_Tiers master file
 Gini_Tiers <- sqldf("select * from Gini_Tiers left join Proj using (Player_Name)")
 
-#add FPTS/G column (assumes each player appears in 16 games)
-Gini_Tiers$FPTSperG<-Gini_Tiers$FPTS/16
+#export Gini_Tiers
+write.csv(Gini_Tiers, file="Gini_Tiers.csv")
 
 
 #Data then used to create an interactive visualization in Tableau. Visualization can be found at: https://public.tableausoftware.com/profile/billpetti#!/vizhome/FantasyFootballProjectionsandConsistency2014/ProjectionsvConsistency
