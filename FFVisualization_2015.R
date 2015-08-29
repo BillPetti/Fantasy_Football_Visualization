@@ -251,6 +251,7 @@ ffl_data$`Projected PPG 2015` <- round(ffl_data$FPTS/16,1)
 # and rename a few columns
 
 colnames(ffl_data)[6:10] <- c("Best Draft Rank", "Worst Draft Rank", "Average Draft Rank", "Standard Deviation Draft Rank", "Average Draft Position")
-colnames(ffl_data)[6] <- "Best Draft Position"
-colnames(ffl_data)[7] <- "Worst Draft Position"
-colnames(ffl_data)[8] <- "Average Draft Position"
+
+# and export the file again
+
+write.csv(ffl_data, file="FF_2015_draft_data2.csv", row.names = FALSE)
