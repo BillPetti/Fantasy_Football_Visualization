@@ -67,6 +67,7 @@ ui <- fluidPage(
                                     tabPanel("About", 
                                              br(), h1("About this tool"), 
                                              p("This tool is maintained by Bill Petti"), br(), h2("Definitions"), p("2016 Consistency: Lower score = more consistent on a game to game basis. Consistency was calculated using Gini coefficients across a player's 2016 games."), br(), p("2016 Normalized Consistency: 2016 Consistency scores were normalized by season and position using z-scores; so, how many standard deviations above or below the league average on a per-player basis. Again, lower scores = more consistent."), br(), p("Normalized Consistency (2013-2016): Average seasonal Consistency from 2013-2016 was calcualted and then normalized by season and position using z-scores; so, how many standard deviations above or below the league average ona per-player basis. Again, lower scores = more consistent."), br(), p("Special thanks to Dennis Erny (http://www.armchairanalysis.com) for the game-by-game data and to FantasyPros.com for the projected points and draft data."), br(), h2("Links"), 
+                                             a("Code for the Shiny app", href = "https://github.com/BillPetti/Fantasy_Football_Visualization/tree/master/shiny_ffl_app"), br(), 
 a("My website", href = "https://billpetti.github.io"), br(),
 a("Find me on Twitter", href = "https://twitter.com/BillPetti")
                                     )))))))
